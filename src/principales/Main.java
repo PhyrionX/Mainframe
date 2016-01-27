@@ -77,9 +77,13 @@ public class Main {
             while (in.available() == 0) {
                 Thread.sleep(100);
             }
+            String pantalla = "";
             while (in.available() > 0) {
-                System.out.print(((char) in.read()));
+
+                pantalla +=  (char) in.read();
+
             }
+            System.out.print(pantalla.replace("data:", ""));
         } catch (IOException ex) {
         } catch (InterruptedException ex) {
         }
