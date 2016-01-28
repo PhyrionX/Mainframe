@@ -2,9 +2,6 @@ package principales;
 
 import java.io.*;
 
-/**
- * Created by Ruben on 27/01/2016.
- */
 public class ConexionMainFrame {
     static Process process;
     private static InputStream in;
@@ -36,11 +33,11 @@ public class ConexionMainFrame {
 
     public void conectar() throws IOException, InterruptedException {
 
-        escribir("connect 155.210.152.51:101");
+        escribir("connect 155.210.152.51:102");
         leerPantalla();
         escribir("enter()");
         leerPantalla();
-        escribir("string(grupo_03)");
+        escribir("string(grupo_07)");
         escribir("Tab()");
         escribir("string(secreto6)");
         leerPantalla();
@@ -82,7 +79,7 @@ public class ConexionMainFrame {
                 leerPantalla();
                 escribir("enter()");
                 leerPantalla();
-                escribir("string(1)");
+                escribir("string(2)");
                 leerPantalla();
                 escribir("enter()");
                 leerPantalla();
@@ -94,9 +91,25 @@ public class ConexionMainFrame {
                 leerPantalla();
                 escribir("enter()");
                 leerPantalla();
+                escribir("string(" + datos[2] + ")");
+                leerPantalla();
+                escribir("enter()");
+                leerPantalla();
                 escribir("string(3)");
                 leerPantalla();
                 escribir("enter()");
+                /*leerPantalla();
+                escribir("string(" + datos[0] + ")");
+                leerPantalla();
+                escribir("enter()");
+                leerPantalla();
+                escribir("string(" + datos[1] + ")");
+                leerPantalla();
+                escribir("enter()");
+                leerPantalla();
+                escribir("string(3)");
+                leerPantalla();
+                escribir("enter()");*/
 
                 //TODO parte de mostrar tareas
                 /*leerPantalla();
