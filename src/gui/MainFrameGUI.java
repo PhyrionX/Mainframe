@@ -8,8 +8,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
-public class MainFrameGUI extends JFrame{
+public class MainFrameGUI extends JFrame implements Observer{
     private JButton bSalir = new JButton("Salir");
     private JButton bNuevaTarea = new JButton("Nueva tarea");
 
@@ -70,13 +72,14 @@ public class MainFrameGUI extends JFrame{
         bNuevaTarea.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String tipo = tfTipoTarea.getText();
-                String fecha = tfFecha.getText();
-                String descripción = tfDescripcion.getText();
+                String tipo = tfTipoTarea.getText().replace(" ", "");
+                String fecha = tfFecha.getText().replace(" ", "");
+                String descripción = tfDescripcion.getText().replace(" ", "");
                 String[] row = {tipo, fecha, descripción};
 
                 tableModel.addRow(row);
-                //System.out.println(conexion.operaciones("add", fecha, descripción));
+                System.out.println(conexion.operaciones("add", fecha, tipo, descripción));
+                System.out.println(conexion.operaciones("mostrar", null));
             }
         });
 
@@ -104,4 +107,10 @@ public class MainFrameGUI extends JFrame{
         }
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        Tarea tarea = (Tarea) arg;
+        String row[] = {tarea.getTipo(), tarea.getFecha(), tarea.getDescripcion()};
+        tableModel.addRow(row);
+    }
 }

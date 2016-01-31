@@ -1,11 +1,18 @@
 package principales;
 
-import java.io.*;
+import modelos.Tarea;
 
-public class ConexionMainFrame {
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+
+public class ConexionMainFrame extends Observable{
     static Process process;
     private static InputStream in;
     private static PrintWriter out;
+    private boolean estadoTratarPantalla = false;
+    private List<Tarea> listaTareas;
 
     public ConexionMainFrame() {
         try {
@@ -33,11 +40,11 @@ public class ConexionMainFrame {
 
     public void conectar() throws IOException, InterruptedException {
 
-        escribir("connect 155.210.152.51:102");
+        escribir("connect 155.210.152.51:101");
         leerPantalla();
         escribir("enter()");
         leerPantalla();
-        escribir("string(grupo_07)");
+        escribir("string(grupo_03)");
         escribir("Tab()");
         escribir("string(secreto6)");
         leerPantalla();
@@ -50,6 +57,7 @@ public class ConexionMainFrame {
         escribir("enter()");
         Thread.sleep(2000);
         leerPantalla();
+        estadoTratarPantalla = true;
        /* escribir("string(2)");
         leerPantalla();
         escribir("enter()");
@@ -61,6 +69,8 @@ public class ConexionMainFrame {
 
     }
     public void escribir(String texto) {
+        out.flush();
+        //System.out.println(texto);
         out.println(texto);
         out.flush();
         try {
@@ -74,7 +84,9 @@ public class ConexionMainFrame {
         String pantalla = "";
 
         switch (op) {
+
             case "add":
+                //System.out.println(datos[0] + " -- " + datos[1] + " -- " + datos[2]);
                 escribir("string(1)");
                 leerPantalla();
                 escribir("enter()");
@@ -83,7 +95,7 @@ public class ConexionMainFrame {
                 leerPantalla();
                 escribir("enter()");
                 leerPantalla();
-                escribir("string(" + datos[0] + ")");
+                escribir("string(" + datos[0]+ ")");
                 leerPantalla();
                 escribir("enter()");
                 leerPantalla();
@@ -98,37 +110,11 @@ public class ConexionMainFrame {
                 escribir("string(3)");
                 leerPantalla();
                 escribir("enter()");
-                /*leerPantalla();
-                escribir("string(" + datos[0] + ")");
-                leerPantalla();
-                escribir("enter()");
-                leerPantalla();
-                escribir("string(" + datos[1] + ")");
-                leerPantalla();
-                escribir("enter()");
-                leerPantalla();
-                escribir("string(3)");
-                leerPantalla();
-                escribir("enter()");*/
-
-                //TODO parte de mostrar tareas
-                /*leerPantalla();
-                escribir("string(2)");
-                leerPantalla();
-                escribir("enter()");
-                leerPantalla();
-                escribir("string(1)");
-                leerPantalla();
-                escribir("enter()");
-                leerPantalla();
-                escribir("string(1)");
-                leerPantalla();
-                escribir("enter()");
-                leerPantalla();
-                escribir("string(1)");
-                leerPantalla();
-                escribir("enter()");*/
                 pantalla = leerPantalla();
+                Tarea tarea = new Tarea(datos[0], datos[1], datos[2]);
+                setChanged();
+                notifyObservers(tarea);
+
                 break;
             case "mostrar":
                 leerPantalla();
@@ -136,21 +122,41 @@ public class ConexionMainFrame {
                 leerPantalla();
                 escribir("enter()");
                 leerPantalla();
-                escribir("string(1)");
+                escribir("string(2)");
                 leerPantalla();
                 escribir("enter()");
                 leerPantalla();
-                escribir("string(1)");
+                escribir("string(3)");
+                getArrayList(leerPantalla());
                 leerPantalla();
                 escribir("enter()");
                 pantalla = leerPantalla();
-                escribir("string(3)");
-                leerPantalla();
-                escribir("enter()");
-                leerPantalla();
                 break;
         }
         return pantalla;
+    }
+
+    private void getArrayList(String pantalla) {
+        listaTareas = new ArrayList<>();
+        String[] lineas = pantalla.split("\n");
+        int lastLine = lineas.length - 1;
+        boolean continuar = true;
+        for (int i = lastLine; (i >= 0) && continuar; i--) {
+            // Recorremos desde la ultima linea con datos de tareas
+            if (lineas[i].trim().equals("TASK")) {
+                String linea = lineas[i].trim().replace("TASK ", "");
+                linea = linea.substring(linea.indexOf(":"));
+                linea = linea.replace(": SPECIFIC", "");
+                String[] datos  = linea.split(" ");
+                Tarea tarea = new Tarea(datos[0], datos[1], datos[3]);
+                listaTareas.add(tarea);
+            }
+            // nos aseguramos que recorra solo una lista de tareas ya qye en la pantalla
+            // puede haber mas de una lista de tareas solo queremos la ultima
+            if (lineas[i].trim().equals("TASK 0")) {
+                continuar = false;
+            }
+        }
     }
 
     public String leerPantalla() {
@@ -172,6 +178,35 @@ public class ConexionMainFrame {
         } catch (IOException ex) {
         } catch (InterruptedException ex) {
         }
-        return pantalla.replace("data:", "");
+        if (estadoTratarPantalla) {
+            tratarPantalla(pantalla.replace("data:", ""));
+        }
+        return pantalla;
+    }
+
+    private void tratarPantalla(String pantalla) {
+        String[] lineas = pantalla.split("\n");
+        int i = 0;
+        for (String linea : lineas) {
+            if (linea.trim().startsWith("TASK")) {
+                System.out.println(linea);
+            }
+            if (linea.contains("------T")) {
+                //System.out.println(linea.contains("------T") + "  linea: " + i + " -> " + lineas[i - 1]);
+                if(!lineas[i - 1].trim().equals("")){
+                    //System.out.println(lineas[i - 1]);
+                    int n = i - 1;
+                    while (lineas[n].trim().startsWith("TASK")) {
+                        System.out.println("Opppp " + lineas[n]);
+                        n--;
+                    }
+                    escribir("enter()");
+                    leerPantalla();
+                }
+
+
+            }
+            i++;
+        }
     }
 }
