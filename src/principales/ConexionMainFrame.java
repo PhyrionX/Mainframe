@@ -80,8 +80,8 @@ public class ConexionMainFrame extends Observable{
         }
     }
 
-    public String operaciones(String op, String... datos) {
-        String pantalla = "";
+    public List<Tarea> operaciones(String op, String... datos) {
+        List<Tarea> listaTareas = null;
 
         switch (op) {
 
@@ -110,7 +110,7 @@ public class ConexionMainFrame extends Observable{
                 escribir("string(3)");
                 leerPantalla();
                 escribir("enter()");
-                pantalla = leerPantalla();
+                leerPantalla();
                 Tarea tarea = new Tarea(datos[0], datos[1], datos[2]);
                 setChanged();
                 notifyObservers(tarea);
@@ -127,16 +127,16 @@ public class ConexionMainFrame extends Observable{
                 escribir("enter()");
                 leerPantalla();
                 escribir("string(3)");
-                getArrayList(leerPantalla());
+                listaTareas = getArrayList(leerPantalla());
                 leerPantalla();
                 escribir("enter()");
-                pantalla = leerPantalla();
+               leerPantalla();
                 break;
         }
-        return pantalla;
+        return listaTareas;
     }
 
-    private void getArrayList(String pantalla) {
+    private List<Tarea> getArrayList(String pantalla) {
         listaTareas = new ArrayList<>();
         String[] lineas = pantalla.split("\n");
         int lastLine = lineas.length - 1;
@@ -157,6 +157,7 @@ public class ConexionMainFrame extends Observable{
                 continuar = false;
             }
         }
+        return listaTareas;
     }
 
     public String leerPantalla() {
@@ -176,7 +177,9 @@ public class ConexionMainFrame extends Observable{
             }
 
         } catch (IOException ex) {
+            System.out.println("Exception");
         } catch (InterruptedException ex) {
+            System.out.println("Exception");
         }
         if (estadoTratarPantalla) {
             tratarPantalla(pantalla.replace("data:", ""));

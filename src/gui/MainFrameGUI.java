@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -35,7 +36,7 @@ public class MainFrameGUI extends JFrame implements Observer{
     public MainFrameGUI(ConexionMainFrame conexion) {
         this.conexion = conexion;
         this.setLayout(null);
-        pruebaTabla();
+        iniciaTabla();
         // Create a table with 10 rows and 5 columns
         JTable tablaTareas = new JTable(tableModel);
         // Make the table vertically scrollable
@@ -75,9 +76,6 @@ public class MainFrameGUI extends JFrame implements Observer{
                 String tipo = tfTipoTarea.getText().replace(" ", "");
                 String fecha = tfFecha.getText().replace(" ", "");
                 String descripción = tfDescripcion.getText().replace(" ", "");
-                String[] row = {tipo, fecha, descripción};
-
-                tableModel.addRow(row);
                 System.out.println(conexion.operaciones("add", fecha, tipo, descripción));
                 System.out.println(conexion.operaciones("mostrar", null));
             }
@@ -94,16 +92,14 @@ public class MainFrameGUI extends JFrame implements Observer{
         this.setVisible(true);
     }
 
-    private void pruebaTabla() {
-        ArrayList<Tarea> arrayTareas = new ArrayList<>();
-        arrayTareas.add(new Tarea("General", "1205", "tarea1"));
-        arrayTareas.add(new Tarea("General", "1205", "tarea2"));
-        arrayTareas.add(new Tarea("General", "1205", "tarea3"));
-        arrayTareas.add(new Tarea("General", "1205", "tarea4"));
+    private void iniciaTabla() {
+        List<Tarea> arrayTareas = conexion.operaciones("mostrar");
 
-        for(Tarea tarea : arrayTareas) {
-            String row[] = {tarea.getTipo(), tarea.getFecha(), tarea.getDescripcion()};
-            tableModel.addRow(row);
+        if (arrayTareas != null) {
+            for (Tarea tarea : arrayTareas) {
+                String row[] = {tarea.getTipo(), tarea.getFecha(), tarea.getDescripcion()};
+                tableModel.addRow(row);
+            }
         }
     }
 
