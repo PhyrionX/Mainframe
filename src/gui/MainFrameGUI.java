@@ -80,8 +80,8 @@ public class MainFrameGUI extends JFrame implements Observer{
                 // Se envía a introducir la tarea
                 String tipo = tfTipoTarea.getText().replace(" ", "");
                 String fecha = tfFecha.getText().replace(" ", "");
-                String descripción = tfDescripcion.getText().replace(" ", "");
-                conexion.operaciones("add", fecha, tipo, descripción);
+                String descripcion = tfDescripcion.getText().replace(" ", "");
+                conexion.operaciones("add", fecha, tipo, descripcion);
                 //System.out.println(conexion.operaciones("mostrar", null));
             }
         });
