@@ -14,6 +14,10 @@ public class ConexionMainFrame extends Observable{
     private boolean estadoTratarPantalla = false;
     private List<Tarea> listaTareas;
 
+    /**
+     * Se inicia el proceso x3270 y coge la entrada y la salida estandar del proceso
+     * Además se llama al método conectar.
+     */
     public ConexionMainFrame() {
         try {
             try {
@@ -38,6 +42,12 @@ public class ConexionMainFrame extends Observable{
         }
     }
 
+    /**
+     * En este método especificamos la ip y el puerto al que nos queremos conectar
+     * Y en el caso del mainframe que nos conectamos introducir el usuario y la contraseña
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public void conectar() throws IOException, InterruptedException {
 
         escribir("connect 155.210.152.51:101");
@@ -68,6 +78,12 @@ public class ConexionMainFrame extends Observable{
 
 
     }
+
+    /**
+     * Función para escribir sobre la entrada estandar del proceso
+     *
+     * @param texto
+     */
     public void escribir(String texto) {
         out.flush();
         //System.out.println(texto);
@@ -80,11 +96,20 @@ public class ConexionMainFrame extends Observable{
         }
     }
 
+    /**
+     * Es la función tanto de guardar tarea como de mostrarla
+     * @param op
+     * @param datos
+     * @return
+     */
     public List<Tarea> operaciones(String op, String... datos) {
         List<Tarea> listaTareas = null;
 
         switch (op) {
-
+            /**
+             * La secuencia de pasos que hay que seguir para introducir una tarea
+             * Una vez que se introduce se notifica al observador para que actualice la tabla
+             */
             case "add":
                 //System.out.println(datos[0] + " -- " + datos[1] + " -- " + datos[2]);
                 escribir("string(1)");
@@ -116,6 +141,10 @@ public class ConexionMainFrame extends Observable{
                 notifyObservers(tarea);
 
                 break;
+            /**
+             * Realizamos las operaciones de ver tareas necesarias y obtenemos una arraylist con las
+             * tareas recuperadas
+             */
             case "mostrar":
                 leerPantalla();
                 escribir("string(2)");
@@ -136,6 +165,14 @@ public class ConexionMainFrame extends Observable{
         return listaTareas;
     }
 
+    /**
+     * En esta funcion se formatea la pantalla y las tareas para obtener
+     * todas las tareas se recorre desde la ultima linea cogiendo todas las tareas
+     * hasta que llegue a la primera de una lista, puede haber mas de una lista de tareas en la pantalla
+     * se recorrera la última mostrada
+     * @param pantalla
+     * @return
+     */
     private List<Tarea> getArrayList(String pantalla) {
         listaTareas = new ArrayList<>();
         String[] lineas = pantalla.split("\n");
@@ -160,6 +197,9 @@ public class ConexionMainFrame extends Observable{
         return listaTareas;
     }
 
+    /**
+     * función para la lectura de la pantalla
+     */
     public String leerPantalla() {
         String pantalla = "";
         try {
@@ -187,6 +227,12 @@ public class ConexionMainFrame extends Observable{
         return pantalla;
     }
 
+    /**
+     * Es la función para comprobar si hemos llegado al final de pantalla y necesitamos una
+     * pulsación de enter adicional para recargar la pantalla
+     *
+     * @param pantalla
+     */
     private void tratarPantalla(String pantalla) {
         String[] lineas = pantalla.split("\n");
         int i = 0;
@@ -200,7 +246,7 @@ public class ConexionMainFrame extends Observable{
                     //System.out.println(lineas[i - 1]);
                     int n = i - 1;
                     while (lineas[n].trim().startsWith("TASK")) {
-                        System.out.println("Opppp " + lineas[n]);
+                        //System.out.println("Opppp " + lineas[n]);
                         n--;
                     }
                     escribir("enter()");

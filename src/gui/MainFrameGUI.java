@@ -31,8 +31,12 @@ public class MainFrameGUI extends JFrame implements Observer{
     String col[] = {"Tipo", "Fecha", "Descripción"};
 
     DefaultTableModel tableModel = new DefaultTableModel(col, 0);
-
-
+    List<Tarea> arrayTareas;
+    /**
+     * Iniciamos la interfaz gráfica
+     *
+     * @param conexion
+     */
     public MainFrameGUI(ConexionMainFrame conexion) {
         this.conexion = conexion;
         this.setLayout(null);
@@ -73,15 +77,21 @@ public class MainFrameGUI extends JFrame implements Observer{
         bNuevaTarea.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Se envía a introducir la tarea
                 String tipo = tfTipoTarea.getText().replace(" ", "");
                 String fecha = tfFecha.getText().replace(" ", "");
                 String descripción = tfDescripcion.getText().replace(" ", "");
-                System.out.println(conexion.operaciones("add", fecha, tipo, descripción));
-                System.out.println(conexion.operaciones("mostrar", null));
+                conexion.operaciones("add", fecha, tipo, descripción);
+                //System.out.println(conexion.operaciones("mostrar", null));
             }
         });
 
-
+        bSalir.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
         this.getContentPane().add(bSalir);
         bSalir.setBounds(600,100, 150,30);
 
@@ -92,20 +102,31 @@ public class MainFrameGUI extends JFrame implements Observer{
         this.setVisible(true);
     }
 
+    /**
+     * Iniciamos la tabla con los datos de tareas recuperados
+     */
     private void iniciaTabla() {
-        List<Tarea> arrayTareas = conexion.operaciones("mostrar");
+        arrayTareas = conexion.operaciones("mostrar");
 
         if (arrayTareas != null) {
             for (Tarea tarea : arrayTareas) {
                 String row[] = {tarea.getTipo(), tarea.getFecha(), tarea.getDescripcion()};
                 tableModel.addRow(row);
             }
+        } else {
+            arrayTareas = new ArrayList<>();
         }
     }
 
+    /**
+     * Actualizamos la tabla de tareas cuando se introduce una nueva tarea correctamente
+     * @param o
+     * @param arg
+     */
     @Override
     public void update(Observable o, Object arg) {
         Tarea tarea = (Tarea) arg;
+        arrayTareas.add(tarea);
         String row[] = {tarea.getTipo(), tarea.getFecha(), tarea.getDescripcion()};
         tableModel.addRow(row);
     }
